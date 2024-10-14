@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useDiscordSdk } from '../hooks/useDiscordSdk'
-import { useApi } from '@/sync/client'
+import { useApi } from './App'
 
 export const Activity = () => {
 	const { authenticated, discordSdk, status, session } = useDiscordSdk()

@@ -1,5 +1,4 @@
-import { Api } from './sync/server/server'
-import { SyncState } from './sync/server/state'
+import { Api, defineApi, SyncState } from 'api-sync/server.js'
 
 type User = {
 	id: string
@@ -23,8 +22,9 @@ export const syncApi = {
 			return [...prev, user]
 		}, channelId)
 	},
-	user: users,
-	internal: {}
+	user: users
 } satisfies Api
+
+defineApi(syncApi)
 
 export type SyncApi = typeof syncApi
