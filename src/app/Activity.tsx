@@ -5,7 +5,7 @@ import { useApi } from './App'
 export const Activity = () => {
 	const { authenticated, discordSdk, status, session } = useDiscordSdk()
 	const api = useApi()
-	const users = api.user.sync(discordSdk.channelId!)
+	const users = api.user.$.useSync(discordSdk.channelId!)
 
 	useEffect(() => {
 		if (!authenticated || !session || !discordSdk.channelId) {

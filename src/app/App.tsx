@@ -3,10 +3,10 @@ import { Activity } from './Activity'
 import './App.css'
 import { useEffect } from 'react'
 import { LoaderCircle } from 'lucide-react'
-import { createApiClient } from 'api-sync/client'
+import { createApiClient } from 'api-sync/client.js'
 import { SyncApi } from '../syncApi'
 
-const { ContextProvider, useApi } = createApiClient<SyncApi>()
+const { ApiContextProvider, useApi } = createApiClient<SyncApi>()
 export { useApi }
 
 function LoadingScreen({ description }: { description?: string }) {
@@ -45,11 +45,11 @@ export default function App() {
 			scope={['identify', 'guilds']}
 			loadingScreen={<LoadingScreen description="Authenticating..." />}
 		>
-			<ContextProvider loadingScreen={<LoadingScreen description="Syncing..." />}>
+			<ApiContextProvider loadingScreen={<LoadingScreen description="Syncing..." />}>
 				<WaitForEverything loadingScreen={<LoadingScreen description="Waiting for everything..." />}>
 					<Activity />
 				</WaitForEverything>
-			</ContextProvider>
+			</ApiContextProvider>
 		</DiscordContextProvider>
 	)
 }
