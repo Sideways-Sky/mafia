@@ -6,7 +6,7 @@ import { LoaderCircle } from 'lucide-react'
 import { createApiClient } from 'api-sync/client.js'
 import { SyncApi } from '../syncApi'
 
-const { ApiContextProvider, useApi } = createApiClient<SyncApi>()
+const { useApi, ApiContextProvider } = createApiClient<SyncApi>()
 export { useApi }
 
 function LoadingScreen({ description }: { description?: string }) {

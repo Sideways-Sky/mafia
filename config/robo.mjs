@@ -21,8 +21,5 @@ export default {
 	},
 	defaults: {
 		help: false
-	},
-	logger: {
-		level: 'debug'
 	}
 }

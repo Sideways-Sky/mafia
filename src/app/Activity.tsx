@@ -1,19 +1,22 @@
 import { useEffect } from 'react'
 import { useDiscordSdk } from '../hooks/useDiscordSdk'
 import { useApi } from './App'
+import { cn } from './lib/utils'
 
 export const Activity = () => {
-	const { authenticated, discordSdk, status, session } = useDiscordSdk()
+	const { discordSdk, status, session } = useDiscordSdk()
 	const api = useApi()
-	const users = api.user.$.useSync(discordSdk.channelId!)
+	const room = api.room.$.useSync(discordSdk.channelId!)
+	const gameEvents = api.gameEvents.$.useSync(discordSdk.channelId!)
+	const playerRole = api.playerRole.$.useSync(session?.user.id)
 
 	useEffect(() => {
-		if (!authenticated || !session || !discordSdk.channelId) {
+		if (!session || !discordSdk.channelId) {
 			return
 		}
 
-		const SyncUser = users?.find((user) => user.id === session.user.id)
-		if (!SyncUser) {
+		const user = room?.users.find((user) => user.id === session.user.id)
+		if (!user) {
 			api.confirmJoin(
 				{
 					id: session.user.id,
@@ -23,16 +26,14 @@ export const Activity = () => {
 				discordSdk.channelId
 			)
 		}
-	}, [authenticated, session, users])
+	}, [session])
 
 	return (
 		<div className="m-0 flex min-h-screen min-w-80 flex-col place-items-center justify-center">
-			<img src="/rocket.png" className="my-4 h-24 duration-300 hover:drop-shadow-[0_0_2em_#646cff]" alt="Discord" />
-			<h1 className="my-4 text-5xl font-bold">Hello, World</h1>
 			<h3 className="my-4 font-bold">{discordSdk.channelId ? `#${discordSdk.channelId}` : status}</h3>
 			<ul className="flex gap-4">
-				{users?.map((user) => (
-					<li key={user.id} className="flex flex-col items-center gap-2 p-2">
+				{room?.users.map((user) => (
+					<li key={user.id} className={cn('flex flex-col items-center gap-2 p-2', user.left && 'opacity-50')}>
 						{user.avatar && (
 							<img
 								src={`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`}
@@ -40,12 +41,29 @@ export const Activity = () => {
 							/>
 						)}
 						{user.username}
+						{room?.gameStatus === 'in-progress-day' && (
+							<button
+								onClick={() => api.gameVote(user.id)}
+								className={cn(
+									'rounded-full bg-blue-500 px-2 py-1 text-white',
+									user.id === session?.user.id && 'bg-red-500'
+								)}
+							>
+								Vote
+							</button>
+						)}
+						{room?.gameStatus === 'in-progress-night' &&
+							playerRole?.actions.map((action, i) => (
+								<button onClick={() => api.gameAction(user.id, i)} key={i} className="rounded-full px-2 py-1">
+									{action}
+								</button>
+							))}
 					</li>
 				))}
 			</ul>
-			<small className="my-4">
-				Powered by <strong>Robo.js</strong>
-			</small>
+			{room?.gameStatus === 'pending' && <button onClick={() => api.gameStart()}>Start Game</button>}
+			<ul className="flex flex-col gap-4">{gameEvents?.map((event) => <li>{event}</li>)}</ul>
+			{playerRole?.name}
 		</div>
 	)
 }
